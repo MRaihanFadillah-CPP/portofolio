@@ -1913,17 +1913,3 @@ body.menu-open .m-link:nth-child(5) { transition-delay: 0.2s; }
     transform: none;
   }
 }
-
-/* ---- Project Section Enhancements ---- */
-.projects-grid {
-  display: grid;
-  gap: 2rem;
-}
-.project-card:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 25px 50px -12px rgba(0,0,0,.4);
-}
-.project-tags span:hover {
-  background: var(--accent);
-  color: var(--accent-contrast);
-}
