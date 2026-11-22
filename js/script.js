@@ -221,7 +221,7 @@
   const form = document.getElementById('contact-form');
   const note = document.getElementById('form-note');
 
-  form.addEventListener('submit', function (event) {
+  form.addEventListener('submit', async function (event) {
     event.preventDefault();
 
     const name = form.querySelector('#name').value.trim();
@@ -234,13 +234,61 @@
       return;
     }
 
-    note.classList.remove('error');
-    note.textContent = 'Terima kasih, ' + name + '! Pesanmu sudah terkirim.';
-    form.reset();
+    // Disable submit button
+    const btn = form.querySelector('button[type="submit"]');
+    const originalBtnText = btn.textContent;
+    btn.textContent = 'Mengirim...';
+    btn.disabled = true;
 
-    setTimeout(function () {
-      note.textContent = '';
-    }, 6000);
+    note.classList.remove('error');
+    note.textContent = '';
+
+    const payload = {
+      name,
+      email,
+      message,
+      _subject: 'Pesan baru dari Portofolio',
+      _template: 'table',
+      _captcha: 'false'
+    };
+
+    try {
+      const response = await fetch('https://formsubmit.co/ajax/raihanf2401@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      const data = await response.json();
+
+      if (data && (data.success === 'true' || data.success === true)) {
+        note.textContent = `Terima kasih, ${name}! Pesanmu sudah terkirim.`;
+        form.reset();
+        btn.textContent = originalBtnText;
+        btn.disabled = false;
+        setTimeout(() => {
+          note.textContent = '';
+        }, 6000);
+      } else {
+        note.textContent = 'Maaf, pesan gagal dikirim. Coba lagi atau hubungi GitHub.';
+        note.classList.add('error');
+        btn.textContent = originalBtnText;
+        btn.disabled = false;
+        setTimeout(() => {
+          note.textContent = '';
+        }, 8000);
+      }
+    } catch (error) {
+      note.textContent = 'Gagal terhubung ke server. Coba lagi nanti.';
+      note.classList.add('error');
+      btn.textContent = originalBtnText;
+      btn.disabled = false;
+      setTimeout(() => {
+        note.textContent = '';
+      }, 8000);
+    }
   });
 
   document.getElementById('year').textContent = new Date().getFullYear();
